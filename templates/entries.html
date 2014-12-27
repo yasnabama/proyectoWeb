@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+	<p>Hola</p>
+	<table class="table table-bordered" >
+		<col style="width:10%;" />
+  		<col style="width:30%;" />
+		<thead>
+			<th>Pedido</th>
+			<th>Mesa</th>
+			<th> Estado </th>
+			<th> Seleccion </th>
+		</thead>
+		{% for entry in entries %}
+		<tr>
+			<th>{{trago.id_trago}}</th>
+			<th>{{trago.tipo}}</th>
+			<th>{{trago.trago}}</th>
+			<th><a href="{{url_for('show_entries')}}">Listo</a></th>
+		</tr>
+		{% endfor %}
+	</table>
+{% endblock content %}

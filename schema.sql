@@ -1,8 +1,13 @@
 BEGIN TRANSACTION;
-CREATE TABLE 'usuario' ( 'id_usuario' integer not null primary key autoincrement, 'nombre' text not null, 'cargo' text not null);
-INSERT INTO `usuario` VALUES ('1','Yasna Barrientos','Mesera');
-INSERT INTO `usuario` VALUES ('2','Pablo Riquelme','Mesero');
-INSERT INTO `usuario` VALUES ('3','Ivo Cuq','Barman');
+CREATE TABLE "usuario" (
+	`id_usuario`	integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+	`nombre`	text NOT NULL,
+	`cargo`	text NOT NULL,
+	`pass`	TEXT
+);
+INSERT INTO `usuario` VALUES ('1','Yasna Barrientos','Mesera','b''\xe6zqD\xf9\xa5\x14\x13\xe6\xb6\xfd\x01Vk\xe7\xc7''');
+INSERT INTO `usuario` VALUES ('2','Pablo Riquelme','Mesero','b''E;\xce^IWF}h\xab1Y\xfe\x1ac\xa0''');
+INSERT INTO `usuario` VALUES ('3','Ivo Cuq','Barman','b''\xb7\xcbQ<\xf2L&p\xfd\xa9\xa1\x8ee\x1b\xd6\xe6''');
 CREATE TABLE `trago` (
 	`tipo`	TEXT NOT NULL,
 	`trago`	TEXT NOT NULL UNIQUE,

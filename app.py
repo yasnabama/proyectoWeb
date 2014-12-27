@@ -30,20 +30,20 @@ def show_entries():
 	return render_template('entries.html',entries=entries)
 
 @app.route('/form', methods=['GET', 'POST'])
-def new_post():
+def new_orden():
 	if request.method=='GET':
-		return render_template('form.html')
-	elif request.method=='POST':
-		title=request.form['title']
-		description=request.form['description']
 		db=connect_db()
-		db.execute(
-			'insert into entry (title,description) values (?,?	)[title,description]')
-		db.commit()
+		cur=db.execute('SELECT distinct tipo from trago ')
+		entries=cur.fetchall()
 		db.close()
-		return u"Operacion exitosa"
+		return render_template('form.html',entries=entries)
 	else:
 		return "Acceso Denegado"
+
+def tipo_trago():
+
+	return render_template('form.html',entries=entries)
+
 
 if __name__ == "__main__":
 	app.run(debug=True)

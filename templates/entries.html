@@ -12,9 +12,9 @@
 		</thead>
 		{% for entry in entries %}
 		<tr>
-			<th>{{bar.id_trago}}</th>
-			<th>{{bar.tipo}}</th>
-			<th>{{bar.trago}}</th>
+			<th>{{trago.id_trago}}</th>
+			<th>{{trago.tipo}}</th>
+			<th>{{trago.trago}}</th>
 			<th><a href="{{url_for('show_entries')}}">Listo</a></th>
 		</tr>
 		{% endfor %}

@@ -49,9 +49,28 @@ def show_entries():
 	db.close()
 	return render_template('entries.html',entries=entries)
 
+#si estas con sesion activa no entras a logiarte
 @app.route('/log')
 def log_():
-	return render_template('log.html')
+	if activo(request.remote_addr)==False:
+		return render_template('log.html')
+	else:	
+		return show_entries()
+
+def activo(a):
+	ip=a
+	db=connect_db()
+	
+	cur=db.execute('SELECT julianday(datetime(\'now\'))-fecha FROM conexion WHERE conexion.ip=\''+ip+'\'')
+	ultimac=[row[0] for row in cur.fetchall()]
+
+	#si ha pasado más de 4 horas el usuario es sacado
+	if (len(ultimac)!=0 and ultimac[0]>0.0003) or (len(ultimac)==0):
+		cur=db.execute('DELETE FROM conexion WHERE conexion.ip=\''+ip+'\'')
+		db.commit();
+		return False
+	else:
+		return True
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -63,16 +82,25 @@ def login():
 		ip=request.remote_addr
 		
 		db=connect_db()
-		cur=db.execute('SELECT id_usuario FROM conexion WHERE conexion.ip=ip')
 		
-		entries=cur.fetchall()
 		
-		if len(entries) == 0:
+
+		cur=db.execute('SELECT id_usuario FROM usuario WHERE usuario.nombre=\''+usuario+'\'')
+		us=[row[0] for row in cur.fetchall()]
+		if len(us) == 0:
+			return render_template('errorUC.html')
+		else:
 			hc=hashlib.md5()
 			hc.update(clave.encode('utf-8'))
-			return hc.digest()
-		else:
-			return "qqq"
+			claveh=hc.digest()
+			cur=db.execute('SELECT pass FROM usuario WHERE usuario.nombre=\''+usuario+'\'')
+			entries=[row[0] for row in cur.fetchall()]
+			if (str(claveh)==entries[0]):
+				cur=db.execute('INSERT into conexion (ip, id_usuario, fecha) values (\''+ip+'\','+str(us[0])+', julianday(datetime(\'now\')))')
+				db.commit()
+				return show_entries()
+			else:
+				return render_template('errorUC.html')
 		db.close()
 		
 	else:
@@ -80,14 +108,26 @@ def login():
 
 @app.route('/form', methods=['GET', 'POST'])
 def new_orden():
-	if request.method=='GET':
-		db=connect_db()
-		cur=db.execute('SELECT distinct tipo from trago ')
-		entries=cur.fetchall()
-		db.close()
-		return render_template('form.html',entries=entries)
+	ip=request.remote_addr
+	db=connect_db()
+	
+	cur=db.execute('SELECT julianday(datetime(\'now\'))-fecha FROM conexion WHERE conexion.ip=\''+ip+'\'')
+	ultimac=[row[0] for row in cur.fetchall()]
+
+	#si ha pasado más de 4 horas el usuario es sacado
+	if (len(ultimac)!=0 and ultimac[0]>0.168) or (len(ultimac)==0):
+		cur=db.execute('DELETE FROM conexion WHERE conexion.ip=\''+ip+'\'')
+		db.commit();
+		return render_template('log.html')
 	else:
-		return "Acceso Denegado"
+		if request.method=='GET':
+			db=connect_db()
+			cur=db.execute('SELECT distinct tipo from trago ')
+			entries=cur.fetchall()
+			db.close()
+			return render_template('form.html',entries=entries)
+		else:
+			return "Acceso Denegado"
 
 def tipo_trago():
 

@@ -20,6 +20,12 @@ def connect_db():
 	rv.row_factory=sqlite3.Row
 	return rv
 
+@app.route('/tipo_Trago', methods=['POST'])
+def signUpUser():
+    tipo =  request.form['username'];
+    password = request.form['password'];
+    return json.dumps({'status':'OK','user':user,'pass':password});
+
 
 @app.route('/')
 def show_entries():

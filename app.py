@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import hashlib
 from sqlite3 import dbapi2 as sqlite3
 from flask import(
 	Flask, 
@@ -28,6 +29,35 @@ def show_entries():
 	entries=cur.fetchall()
 	db.close()
 	return render_template('entries.html',entries=entries)
+
+@app.route('/log')
+def log_():
+	return render_template('log.html')
+
+@app.route('/', methods=['GET', 'POST'])
+def login():
+	if request.method=='GET':
+		return render_template('form.html')
+	elif request.method=='POST':
+		usuario=request.form['inputUser']
+		clave=request.form['inputPassword']
+		ip=request.remote_addr
+		
+		db=connect_db()
+		cur=db.execute('SELECT id_usuario FROM conexion WHERE conexion.ip=ip')
+		
+		entries=cur.fetchall()
+		
+		if len(entries) == 0:
+			hc=hashlib.md5()
+			hc.update(clave.encode('utf-8'))
+			return hc.digest()
+		else:
+			return "qqq"
+		db.close()
+		
+	else:
+		return "Acceso Denegado"
 
 @app.route('/form', methods=['GET', 'POST'])
 def new_orden():

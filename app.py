@@ -44,16 +44,35 @@ def login():
 		ip=request.remote_addr
 		
 		db=connect_db()
-		cur=db.execute('SELECT id_usuario FROM conexion WHERE conexion.ip=ip')
 		
+		cur=db.execute('SELECT julianday(datetime(\'now\'))-fecha FROM conexion WHERE conexion.ip=\''+ip+'\'')
+		ultimac=[row[0] for row in cur.fetchall()]
+		if len(ultimac)!=0 and ultimac[0]>0.168:
+			cur=db.execute('DELETE FROM conexion WHERE conexion.ip=\''+ip+'\'')
+			db.commit();
+
+		cur=db.execute('SELECT id_usuario FROM conexion WHERE conexion.ip=\''+ip+'\'')
 		entries=cur.fetchall()
-		
+
 		if len(entries) == 0:
-			hc=hashlib.md5()
-			hc.update(clave.encode('utf-8'))
-			return hc.digest()
+			cur=db.execute('SELECT id_usuario FROM usuario WHERE usuario.nombre=\''+usuario+'\'')
+			us=[row[0] for row in cur.fetchall()]
+			if len(us) == 0:
+				return "usuario o contraseña incorrecto"
+			else:
+				hc=hashlib.md5()
+				hc.update(clave.encode('utf-8'))
+				claveh=hc.digest()
+				cur=db.execute('SELECT pass FROM usuario WHERE usuario.nombre=\''+usuario+'\'')
+				entries=[row[0] for row in cur.fetchall()]
+				if (str(claveh)==entries[0]):
+					cur=db.execute('INSERT into conexion (ip, id_usuario, fecha) values (\''+ip+'\','+str(us[0])+', julianday(datetime(\'now\')))')
+					db.commit()
+					return show_entries()
+				else:
+					return "usuario o contraseña incorrecto" 
 		else:
-			return "qqq"
+			return "conexion vigente, preguntar ultima conexion"
 		db.close()
 		
 	else:

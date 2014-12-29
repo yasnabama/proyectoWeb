@@ -8,7 +8,8 @@ from flask import(
 	request,
 	url_for,
 	flash,
-	redirect)
+	redirect,
+	json)
 from werkzeug import secure_filename
 
 
@@ -21,11 +22,23 @@ def connect_db():
 	rv.row_factory=sqlite3.Row
 	return rv
 
-@app.route('/tipo_Trago', methods=['POST'])
-def signUpUser():
-    tipo =  request.form['username'];
-    password = request.form['password'];
-    return json.dumps({'status':'OK','user':user,'pass':password});
+@app.route('/tipo_Trago',methods=['POST'])
+def tipo_Trago():
+	tipoT=str(request.form['seleccionTipoTrago'])
+	return eleccionTrago(tipoT)
+
+
+
+def eleccionTrago(tipoT):
+	db=connect_db()
+	cur=db.execute('SELECT trago from trago where trago.tipo=\''+tipoT+'\'')
+	ent=[row[0] for row in cur.fetchall()]
+	pal=''
+	for i in range (len(ent)):
+		pal=pal+str(ent[i])+'-'
+	db.close()
+	print(pal)
+	return pal
 
 
 @app.route('/')

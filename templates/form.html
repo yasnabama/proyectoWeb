@@ -4,11 +4,11 @@
 
 {% block content %}
     <form class="form-horizontal" role="form" name="input"  method="post" enctype="multipart/form-data">
-        <div class="form-group">
+        <div class="form-group" class="col-lg-6 col-lg-offset-3 text-center">
             <label for="tipoTrago" class="col-sm-2 control-label">Seleccione Tipo de Trago:</label>
             <div class="col-sm-10">
-                <select name="seleccionTrago" width="300px" id="tipoTrago" > 
-                    <option name="">Seleccione</opcion>
+                <select name="seleccionTipoTrago" width="300px" id="tipoTrago" > 
+                    <option name="">--</opcion>
                     {% for trago in entries %}
                         <option name="{{trago.tipo}}">{{trago.tipo}}</option>
                     {% endfor %}
@@ -16,12 +16,14 @@
 
             </div>
         </div>
+        
         <div class="form-group">
             <div class="col-sm-10">
-                 <label for="tipoTrago" class="col-sm-2 control-label">Seleccione Trago:</label>
-                <select name="seleccionTrago" width="300px" > 
-                    {% for trago in entries %}
-                        <option name="{{trago.id_trago}}">{{trago.trago}}</option>
+                <label for="Trago" class="col-sm-2 control-label">Seleccione Trago:</label>
+                <select name="seleccionTrago" width="300px"> 
+                    <option name="">--</opcion>
+                    {% for trago in ent %}
+                        <option name="{{trago.trago}}">{{trago.trago}}</option>
                     {% endfor %}
                 </select>        
             </div>
@@ -30,14 +32,39 @@
         <div class="form-group">
             <label for="trago" class="col-sm-2 control-label">Seleccione Cantidad:</label>
             <div class="col-sm-10">
-                <input class="form-control" type="text" name="trago" >
+                <select name="seleccionCantidad" width="300px" id="cantidad"> 
+                    <option name="">--</opcion>
+                    <option name="1">1</opcion>
+                    <option name="2">2</opcion>
+                    <option name="3">3</opcion>
+                    <option name="4">4</opcion>
+                    <option name="5">5</opcion>
+                    <option name="6">6</opcion>
+                    <option name="7">7</opcion>
+                </select>
             </div>
         </div>
         <hr>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-            <input type="submit" value="Añadir Item" class="btn btn-default">
+            <button type="button" value="añadirItem" name="añadirItem" id="añadirItem"class="btn btn-warning añadirItem">Añadir Item</button>
             </div>
         </div>
     </form>
+
+    <div align="center" id="containers">
+            <table class="table table-hover table-bordered" padding-left="100" id="tablamon">
+                <thead>
+                    <th>Tipo Trago</th>
+                    <th>Trago</th>
+                    <th>Cantidad</th>
+                    <th>Eliminar</th>
+                </thead>
+                <tbody id="tabla_resumen"></tbody>
+            </table>
+            <button type="button" class="btn btn-success" id="confirmar" name="confirmar">
+                <span class="glyphicon glyphicon-plus"></span>
+                Confirmar Pedido
+            </button>
+        </div>
 {% endblock content %}

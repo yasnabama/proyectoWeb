@@ -24,11 +24,14 @@ def connect_db():
 
 @app.route('/')
 def show_entries():
-	db=connect_db()
-	cur=db.execute('SELECT id_trago, trago, tipo from trago ')
-	entries=cur.fetchall()
-	db.close()
-	return render_template('entries.html',entries=entries)
+	if activo(request.remote_addr)==False:
+		return render_template('log.html')
+	else:
+		db=connect_db()
+		cur=db.execute('SELECT id_trago, trago, tipo from trago ')
+		entries=cur.fetchall()
+		db.close()
+		return render_template('entries.html',entries=entries)
 
 #si estas con sesion activa no entras a logiarte
 @app.route('/log')
@@ -89,16 +92,7 @@ def login():
 
 @app.route('/form', methods=['GET', 'POST'])
 def new_orden():
-	ip=request.remote_addr
-	db=connect_db()
-	
-	cur=db.execute('SELECT julianday(datetime(\'now\'))-fecha FROM conexion WHERE conexion.ip=\''+ip+'\'')
-	ultimac=[row[0] for row in cur.fetchall()]
-
-	#si ha pasado más de 4 horas el usuario es sacado
-	if (len(ultimac)!=0 and ultimac[0]>0.168) or (len(ultimac)==0):
-		cur=db.execute('DELETE FROM conexion WHERE conexion.ip=\''+ip+'\'')
-		db.commit();
+	if activo(request.remote_addr)==False:
 		return render_template('log.html')
 	else:
 		if request.method=='GET':

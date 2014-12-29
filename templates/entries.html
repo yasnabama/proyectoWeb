@@ -12,11 +12,12 @@
 		</thead>
 		{% for trago in entries %}
 		<tr>
-			<th>{{trago.id_trago}}</th>
+			<th id="{{trago.id_trago}}">{{trago.id_trago}}</th>
 			<th>{{trago.tipo}}</th>
 			<th>{{trago.trago}}</th>
-			<th><a href="{{url_for('show_entries')}}">Listo</a></th>
+			<th><button type='button' class='btn btn-danger btnListo' ><span class='glyphicon glyphicon-ok'></span></button></th>
 		</tr>
 		{% endfor %}
 	</table>
+	
 {% endblock content %}

@@ -15,8 +15,9 @@
 			<th>{{trago.id_trago}}</th>
 			<th>{{trago.tipo}}</th>
 			<th>{{trago.trago}}</th>
-			<th><a href="{{url_for('show_entries')}}">Listo</a></th>
+			<th><button type='button' class='btn btn-danger btnDelete' onchange="{{url_for('new_orden')}}"><span class='glyphicon glyphicon-ok'></span></button></th>
 		</tr>
 		{% endfor %}
 	</table>
+	
 {% endblock content %}

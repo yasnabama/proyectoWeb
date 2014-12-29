@@ -7,6 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+
 <link href="{{url_for('static', filename='bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
 <link href="{{url_for('static', filename='bootstrap/css/bootstrap-theme.min.css')}}" rel="stylesheet">
 
@@ -19,7 +20,9 @@
         padding-top: 50px;
         }
 </style>
+{% block morehead %}
 
+{% endblock morehead %}
 <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>
   <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
@@ -40,10 +43,11 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="{{url_for('show_entries')}}">Iniciar Login</a>
+      <a class="navbar-brand" href="{{url_for('log_')}}">Iniciar Login</a>
     </div>
     <div class="collapse navbar-collapse">
       <ul class="nav navbar-nav">
+        <!--<li><a href="{{url_for('log_')}}">Login</a></li>-->
         <li><a href="{{url_for('show_entries')}}">Pedidos por servir </a></li>
         <li><a href="{{url_for('new_orden')}}">Tomar Pedido</a></li>
         

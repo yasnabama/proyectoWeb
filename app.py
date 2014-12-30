@@ -43,6 +43,20 @@ def servido():
 		return pedido_barra()
 
 
+@app.route('/entries',methods=['POST'])
+def entregado():
+	if activo(request.remote_addr)==False:
+		return render_template('log.html')
+	else:
+
+		id_p=str(request.form['idp'])
+		trago=str(request.form['trago'])
+		db=connect_db()
+		cur=db.execute('update pedido_trago set estado=\'servido\' WHERE id_pedido=\''+id_p+'\' and id_trago=(SELECT id_trago from trago where trago=\''+trago+'\');')
+		db.commit();
+		db.close();
+		return show_entries()
+
 def eleccionTrago(tipoT):
 	db=connect_db()
 	cur=db.execute('SELECT trago from trago where trago.tipo=\''+tipoT+'\'')
@@ -61,10 +75,10 @@ def show_entries():
 		return render_template('log.html')
 	else:
 		db=connect_db()
-		cur=db.execute('SELECT id_trago, trago, tipo from trago ')
+		cur=db.execute('select pedido.id_pedido, n_mesa, trago, cantidad from pedido, pedido_trago, trago where pedido.id_pedido=pedido_trago.id_pedido and estado=\'en barra\' and pedido_trago.id_trago=trago.id_trago;')
 		entries=cur.fetchall()
 		db.close()
-		return render_template('entries.html',entries=entries)
+		return render_template('entries.html', pedido=entries)
 
 #si estas con sesion activa no entras a logiarte
 @app.route('/log')
@@ -133,10 +147,8 @@ def pedido_barra():
 		db=connect_db()
 		cur=db.execute('select pedido.id_pedido, n_mesa, trago, cantidad from pedido, pedido_trago, trago where pedido.id_pedido=pedido_trago.id_pedido and estado=\'pendiente\' and pedido_trago.id_trago=trago.id_trago;')
 		entries=cur.fetchall()
-		cur=db.execute('select distinct pedido.id_pedido, n_mesa from pedido_trago, pedido where estado=\'pendiente\' and pedido.id_pedido=pedido_trago.id_pedido;')
-		entries1=cur.fetchall()
 		db.close()
-		return render_template('tragospendientes.html', pedido=entries, pendientes=entries1)
+		return render_template('tragospendientes.html', pedido=entries)
 
 @app.route('/form', methods=['GET', 'POST'])
 def new_orden():

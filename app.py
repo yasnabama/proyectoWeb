@@ -27,6 +27,20 @@ def tipo_Trago():
 	tipoT=str(request.form['seleccionTipoTrago'])
 	return eleccionTrago(tipoT)
 
+#actualiza el estado del pedido... informando que se encuentra en barra para ser servido
+@app.route('/pendientes',methods=['POST'])
+def servido():
+	if activo(request.remote_addr)==False:
+		return render_template('log.html')
+	else:
+
+		id_p=str(request.form['idp'])
+		trago=str(request.form['trago'])
+		db=connect_db()
+		cur=db.execute('update pedido_trago set estado=\'en barra\' WHERE id_pedido=\''+id_p+'\' and id_trago=(SELECT id_trago from trago where trago=\''+trago+'\');')
+		db.commit();
+		db.close();
+		return pedido_barra()
 
 
 def eleccionTrago(tipoT):
@@ -68,13 +82,14 @@ def activo(a):
 	ultimac=[row[0] for row in cur.fetchall()]
 
 	#si ha pasado más de 4 horas el usuario es sacado
-	if (len(ultimac)!=0 and ultimac[0]>0.0003) or (len(ultimac)==0):
+	if (len(ultimac)!=0 and ultimac[0]>0.0070) or (len(ultimac)==0):
 		cur=db.execute('DELETE FROM conexion WHERE conexion.ip=\''+ip+'\'')
 		db.commit();
 		return False
 	else:
 		return True
 
+#logea a los usuarios
 @app.route('/', methods=['GET', 'POST'])
 def login():
 	if request.method=='GET':
@@ -108,6 +123,20 @@ def login():
 		
 	else:
 		return "Acceso Denegado"
+
+#carga los pedidos pendientes para que el barman los pueda tener en lista
+@app.route('/pendientes')
+def pedido_barra():
+	if activo(request.remote_addr)==False:
+		return render_template('log.html')
+	else:
+		db=connect_db()
+		cur=db.execute('select pedido.id_pedido, n_mesa, trago, cantidad from pedido, pedido_trago, trago where pedido.id_pedido=pedido_trago.id_pedido and estado=\'pendiente\' and pedido_trago.id_trago=trago.id_trago;')
+		entries=cur.fetchall()
+		cur=db.execute('select distinct pedido.id_pedido, n_mesa from pedido_trago, pedido where estado=\'pendiente\' and pedido.id_pedido=pedido_trago.id_pedido;')
+		entries1=cur.fetchall()
+		db.close()
+		return render_template('tragospendientes.html', pedido=entries, pendientes=entries1)
 
 @app.route('/form', methods=['GET', 'POST'])
 def new_orden():

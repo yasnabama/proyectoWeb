@@ -48,7 +48,6 @@ def entregado():
 	if activo(request.remote_addr)==False:
 		return render_template('log.html')
 	else:
-
 		id_p=str(request.form['idp'])
 		trago=str(request.form['trago'])
 		db=connect_db()
@@ -73,20 +72,35 @@ def eleccionTrago(tipoT):
 def show_entries():
 	if activo(request.remote_addr)==False:
 		return render_template('log.html')
-	else:
-		db=connect_db()
-		cur=db.execute('select pedido.id_pedido, n_mesa, trago, cantidad from pedido, pedido_trago, trago where pedido.id_pedido=pedido_trago.id_pedido and estado=\'en barra\' and pedido_trago.id_trago=trago.id_trago;')
-		entries=cur.fetchall()
-		db.close()
-		return render_template('entries.html', pedido=entries)
-
+	else:	
+		if(cargo_usuario()=='m'):
+			db=connect_db()
+			cur=db.execute('select pedido.id_pedido, n_mesa, trago, cantidad from pedido, pedido_trago, trago where pedido.id_pedido=pedido_trago.id_pedido and estado=\'en barra\' and pedido_trago.id_trago=trago.id_trago;')
+			entries=cur.fetchall()
+			db.close()
+			return render_template('entries.html', pedido=entries)
+		else:
+			return render_template('invalidoM.html')
 #si estas con sesion activa no entras a logiarte FALTA VER Q CARGO
 @app.route('/')
 def log_():
 	if activo(request.remote_addr)==False:
 		return render_template('log.html')
-	else:	
-		return show_entries()
+	else:
+		if(cargo_usuario()=='m'):
+			return show_entries()
+		else:
+			return pedido_barra()
+
+def cargo_usuario():
+	db=connect_db()
+	cur=db.execute('select cargo from usuario, conexion where conexion.id_usuario=usuario.id_usuario and ip=\''+request.remote_addr+'\';')
+	co=[row[0] for row in cur.fetchall()]
+	if(co[0]=='Barman'):
+		return 'b'
+	else:
+		return 'm'
+	db.close
 
 def activo(a):
 	ip=a
@@ -167,25 +181,31 @@ def pedido_barra():
 	if activo(request.remote_addr)==False:
 		return render_template('log.html')
 	else:
-		db=connect_db()
-		cur=db.execute('select pedido.id_pedido, n_mesa, trago, cantidad from pedido, pedido_trago, trago where pedido.id_pedido=pedido_trago.id_pedido and estado=\'pendiente\' and pedido_trago.id_trago=trago.id_trago;')
-		entries=cur.fetchall()
-		db.close()
-		return render_template('tragospendientes.html', pedido=entries)
+		if (cargo_usuario()=='b'):
+			db=connect_db()
+			cur=db.execute('select pedido.id_pedido, n_mesa, trago, cantidad from pedido, pedido_trago, trago where pedido.id_pedido=pedido_trago.id_pedido and estado=\'pendiente\' and pedido_trago.id_trago=trago.id_trago;')
+			entries=cur.fetchall()
+			db.close()
+			return render_template('tragospendientes.html', pedido=entries)
+		else:
+			return render_template('invalidoB.html')
 
 @app.route('/form', methods=['GET', 'POST'])
 def new_orden():
 	if activo(request.remote_addr)==False:
 		return render_template('log.html')
 	else:
-		if request.method=='GET':
-			db=connect_db()
-			cur=db.execute('SELECT distinct tipo from trago ')
-			entries=cur.fetchall()
-			db.close()
-			return render_template('form.html',entries=entries)
+		if (cargo_usuario()=='m'):
+			if request.method=='GET':
+				db=connect_db()
+				cur=db.execute('SELECT distinct tipo from trago ')
+				entries=cur.fetchall()
+				db.close()
+				return render_template('form.html',entries=entries)
+			else:
+				return "Acceso Denegado"
 		else:
-			return "Acceso Denegado"
+			return render_template('invalidoM.html')
 
 def tipo_trago():
 

@@ -66,6 +66,7 @@ function ElimItem(i){
 
 }
 
+
 function confirmar(){
 	var i=0;
 	$('#tabla_resumen tr').each(function () {

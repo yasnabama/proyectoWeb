@@ -4,6 +4,21 @@
 
 {% block content %}
     <form class="form-horizontal" role="form" name="input"  method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="mesa" class="col-sm-2 control-label">Seleccione Mesa:</label>
+            <div class="col-sm-10">
+                <select name="seleccionMesa" width="300px" id="mesa"> 
+                    <option name="">--</opcion>
+                    <option name="1">1</opcion>
+                    <option name="2">2</opcion>
+                    <option name="3">3</opcion>
+                    <option name="4">4</opcion>
+                    <option name="5">5</opcion>
+                    <option name="6">6</opcion>
+                    <option name="7">7</opcion>
+                </select>
+            </div>
+        </div>
         <div class="form-group" class="col-lg-6 col-lg-offset-3 text-center">
             <label for="tipoTrago" class="col-sm-2 control-label">Seleccione Tipo de Trago:</label>
             <div class="col-sm-10">
@@ -20,8 +35,7 @@
         <div class="form-group">
             <div class="col-sm-10">
                 <label for="Trago" class="col-sm-2 control-label">Seleccione Trago:</label>
-                <select name="seleccionTrago" width="300px"> 
-                    <option name="">--</opcion>
+                <select name="seleccionTrago" width="300px" id="seleccionTrago"> 
                     {% for trago in ent %}
                         <option name="{{trago.trago}}">{{trago.trago}}</option>
                     {% endfor %}
@@ -47,7 +61,7 @@
         <hr>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-            <button type="button" value="añadirItem" name="añadirItem" id="añadirItem"class="btn btn-warning añadirItem">Añadir Item</button>
+            <button type="button" value="añadirItem" name="añadirItem" id="añadirItem"class="btn btn-warning añadirItem" onclick="añadItem()">Añadir Item</button>
             </div>
         </div>
     </form>
@@ -55,14 +69,14 @@
     <div align="center" id="containers">
             <table class="table table-hover table-bordered" padding-left="100" id="tablamon">
                 <thead>
-                    <th>Tipo Trago</th>
+                    <th>Mesa</th>
                     <th>Trago</th>
                     <th>Cantidad</th>
                     <th>Eliminar</th>
                 </thead>
                 <tbody id="tabla_resumen"></tbody>
             </table>
-            <button type="button" class="btn btn-success" id="confirmar" name="confirmar">
+            <button type="button" class="btn btn-success" id="confirmar" name="confirmar" onclick="confirmar()">
                 <span class="glyphicon glyphicon-plus"></span>
                 Confirmar Pedido
             </button>

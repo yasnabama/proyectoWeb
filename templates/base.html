@@ -2,7 +2,7 @@
 <html>
 <head>
 {% block head %}
-<title>{% block title %}Mesero{% endblock title %}</title>
+<title>{% block title %}Trago-ON{% endblock title %}</title>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -45,7 +45,7 @@
         <span class="icon-bar"></span>
 
       </button>
-      <a class="navbar-brand" href="{{url_for('log_')}}">Iniciar Login</a>
+      <a class="navbar-brand" href="{{url_for('log_')}}">Iniciar Sesión</a>
     </div>
     <div class="collapse navbar-collapse">
       <ul class="nav navbar-nav">
@@ -53,9 +53,11 @@
         <li><a href="{{url_for('show_entries')}}">Pedidos por entregar</a></li>
         <li><a href="{{url_for('new_orden')}}">Tomar Pedido</a></li>
         <li><a href="{{url_for('pedido_barra')}}">Pedidos por servir</a></li>
-        <li><a href="{{url_for('logout')}}">Cerrar Sesión</a></li>
+       
         
       </ul>
+      <a class="navbar-brand pull-right" href="{{url_for('logout')}}">Cerrar Sesión</a>
+      
     </div><!--/.nav-collapse -->
   </div>
 </div>

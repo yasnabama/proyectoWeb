@@ -22,6 +22,52 @@ def connect_db():
 	rv.row_factory=sqlite3.Row
 	return rv
 
+@app.route('/confirmarP/<string:data>',methods=['POST'])
+def confirmarP(data):
+	consu=data.split("-")
+	mesa=consu[0] #Numero de mesa
+	trago=consu[1] #trago
+	trago=trago.replace("_"," ")
+	cantidad=int(consu[2])
+	i=int(consu[3]);
+	ip=request.remote_addr # Usuario conectado para saber su id
+	if (i==1):
+		#hace insert en tabla pedido
+		db=connect_db()
+		us=db.execute('SELECT id_usuario FROM conexion WHERE conexion.ip=\''+ip+'\'') #Obtiene el usuario (garzon)conectado para añadirlo a la tabla pedido.
+		us=[row[0] for row in us.fetchall()]
+		cur=db.execute('INSERT into pedido (id_garzon, n_mesa, fecha) values ('+str(us[0])+','+str(mesa)+', datetime(\'now\')) ')
+		db.commit()
+		#Select para saber el id_pedido generado con el insert actual.
+		us1=db.execute('SELECT id_pedido FROM pedido ORDER BY id_pedido DESC LIMIT 1')
+		us1=[row[0] for row in us1.fetchall()]
+		print(us1[0])
+		#Select para saber el id_trago 
+		us2=db.execute('SELECT id_trago FROM trago where trago.trago=\''+trago+'\'')
+		us2=[row[0] for row in us2.fetchall()]
+		print(us2[0])
+		#insert a tabla pedido_trago de la prierma fila que encuentra en la tabla resumen. 
+		cur=db.execute('INSERT into pedido_trago (id_pedido, id_trago, cantidad, estado) values ('+str(us1[0])+','+str(us2[0])+','+str(cantidad)+', "pendiente") ')
+		db.commit()
+		db.close()
+		return new_orden()
+	else:
+		db=connect_db()
+		#Select para saber el id_pedido generado con el insert actual.
+		us1=db.execute('SELECT id_pedido FROM pedido ORDER BY id_pedido DESC LIMIT 1')
+		us1=[row[0] for row in us1.fetchall()]
+		print(us1[0])
+		#Select para saber el id_trago 
+		us2=db.execute('SELECT id_trago FROM trago where trago.trago=\''+trago+'\'')
+		us2=[row[0] for row in us2.fetchall()]
+		# insert con las demas filas de la tabla. 
+		print(us2[0])
+		cur=db.execute('INSERT into pedido_trago (id_pedido, id_trago, cantidad, estado) values ('+str(us1[0])+','+str(us2[0])+','+str(cantidad)+', "pendiente") ')
+		db.commit()
+		db.close()
+		return new_orden()
+
+
 @app.route('/tipo_Trago',methods=['POST'])
 def tipo_Trago():
 	tipoT=str(request.form['seleccionTipoTrago'])
@@ -128,10 +174,6 @@ def new_orden():
 			return render_template('form.html',entries=entries)
 		else:
 			return "Acceso Denegado"
-
-def tipo_trago():
-
-	return render_template('form.html',entries=entries)
 
 
 if __name__ == "__main__":

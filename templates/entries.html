@@ -1,30 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<<<<<<< HEAD
-=======
-<HEAD>
-	<p>Hola</p>
-	<table class="table table-bordered" >
-		<col style="width:10%;" />
-  		<col style="width:30%;" />
-		<thead>
-			<th>Pedido</th>
-			<th>Mesa</th>
-			<th> Estado </th>
-			<th> Seleccion </th>
-		</thead>
-		{% for trago in entries %}
-		<tr>
-			<th id="{{trago.id_trago}}">{{trago.id_trago}}</th>
-			<th>{{trago.tipo}}</th>
-			<th>{{trago.trago}}</th>
-			<th><button type='button' class='btn btn-danger btnListo' onclick="botonListo('id')"><span class='glyphicon glyphicon-ok' ></span></button></th>
-		</tr>
-		{% endfor %}
-	</table>
-	
->>>>>>> 9ce75cbe5b82bd29e4b39236234fe0dbc6861b50
     <form  class="form-horizontal" role="form" name="input"  action="{{ url_for('entregado') }}" method="post" enctype="multipart/form-data">      
         <div align="center" id="containers">
         	<h1 class="cover-heading">TRAGOS EN BARRA</h1>
@@ -48,10 +24,7 @@
             </table>
         </div>
     </form>
-<<<<<<< HEAD
-    
-=======
->>>>>>> 9ce75cbe5b82bd29e4b39236234fe0dbc6861b50
+
 {% endblock content %}
 
 

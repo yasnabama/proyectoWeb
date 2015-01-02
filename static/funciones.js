@@ -7,7 +7,7 @@ $(document).ready(function() {
 	        data: $('form').serialize(),
 	        type: 'POST',
 	        success: function(response) {
-	            console.log(response);
+	            //console.log(response);
 	            segSelec(response);
 	        },
 	        error: function(error) {

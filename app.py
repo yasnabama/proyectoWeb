@@ -231,6 +231,7 @@ def pedido_barra():
 			db=connect_db()
 			cur=db.execute('select pedido.id_pedido, n_mesa, trago, cantidad from pedido, pedido_trago, trago where pedido.id_pedido=pedido_trago.id_pedido and estado=\'pendiente\' and pedido_trago.id_trago=trago.id_trago;')
 			entries=cur.fetchall()
+			print("kk")
 			db.close()
 			return render_template('tragospendientes.html', pedido=entries)
 		else:

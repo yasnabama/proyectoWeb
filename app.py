@@ -73,7 +73,34 @@ def tipo_Trago():
 	tipoT=str(request.form['seleccionTipoTrago'])
 	return eleccionTrago(tipoT)
 
+#actualiza el estado del pedido... informando que se encuentra en barra para ser servido
+@app.route('/pendientes',methods=['POST'])
+def servido():
+	if activo(request.remote_addr)==False:
+		return render_template('log.html')
+	else:
 
+		id_p=str(request.form['idp'])
+		trago=str(request.form['trago'])
+		db=connect_db()
+		cur=db.execute('update pedido_trago set estado=\'en barra\' WHERE id_pedido=\''+id_p+'\' and id_trago=(SELECT id_trago from trago where trago=\''+trago+'\');')
+		db.commit();
+		db.close();
+		return pedido_barra()
+
+
+@app.route('/entries',methods=['POST'])
+def entregado():
+	if activo(request.remote_addr)==False:
+		return render_template('log.html')
+	else:
+		id_p=str(request.form['idp'])
+		trago=str(request.form['trago'])
+		db=connect_db()
+		cur=db.execute('update pedido_trago set estado=\'servido\' WHERE id_pedido=\''+id_p+'\' and id_trago=(SELECT id_trago from trago where trago=\''+trago+'\');')
+		db.commit();
+		db.close();
+		return show_entries()
 
 def eleccionTrago(tipoT):
 	db=connect_db()
@@ -87,21 +114,39 @@ def eleccionTrago(tipoT):
 	return pal
 
 
-@app.route('/')
+@app.route('/enbarra')
 def show_entries():
-	db=connect_db()
-	cur=db.execute('SELECT id_trago, trago, tipo from trago ')
-	entries=cur.fetchall()
-	db.close()
-	return render_template('entries.html',entries=entries)
-
-#si estas con sesion activa no entras a logiarte
-@app.route('/log')
-def log_():
 	if activo(request.remote_addr)==False:
 		return render_template('log.html')
 	else:	
-		return show_entries()
+		if(cargo_usuario()=='m'):
+			db=connect_db()
+			cur=db.execute('select pedido.id_pedido, n_mesa, trago, cantidad from pedido, pedido_trago, trago where pedido.id_pedido=pedido_trago.id_pedido and estado=\'en barra\' and pedido_trago.id_trago=trago.id_trago;')
+			entries=cur.fetchall()
+			db.close()
+			return render_template('entries.html', pedido=entries)
+		else:
+			return render_template('invalidoM.html')
+#si estas con sesion activa no entras a logiarte FALTA VER Q CARGO
+@app.route('/')
+def log_():
+	if activo(request.remote_addr)==False:
+		return render_template('log.html')
+	else:
+		if(cargo_usuario()=='m'):
+			return show_entries()
+		else:
+			return pedido_barra()
+
+def cargo_usuario():
+	db=connect_db()
+	cur=db.execute('select cargo from usuario, conexion where conexion.id_usuario=usuario.id_usuario and ip=\''+request.remote_addr+'\';')
+	co=[row[0] for row in cur.fetchall()]
+	if(co[0]=='Barman'):
+		return 'b'
+	else:
+		return 'm'
+	db.close
 
 def activo(a):
 	ip=a
@@ -111,14 +156,24 @@ def activo(a):
 	ultimac=[row[0] for row in cur.fetchall()]
 
 	#si ha pasado más de 4 horas el usuario es sacado
-	if (len(ultimac)!=0 and ultimac[0]>0.0003) or (len(ultimac)==0):
+	if (len(ultimac)!=0 and ultimac[0]>0.0070) or (len(ultimac)==0):
 		cur=db.execute('DELETE FROM conexion WHERE conexion.ip=\''+ip+'\'')
 		db.commit();
 		return False
 	else:
 		return True
+def cargo(usuario):
+	db=connect_db()
+	cur=db.execute('SELECT cargo FROM usuario WHERE usuario.nombre=\''+usuario+'\'')
+	cargo=[row[0] for row in cur.fetchall()]
+	db.close()
+	if (str(cargo[0])=='Mesero' or str(cargo[0])=='Mesera'):
+		return 'm'
+	else:
+		return 'b'
 
-@app.route('/', methods=['GET', 'POST'])
+#logea a los usuarios
+@app.route('/log', methods=['GET', 'POST'])
 def login():
 	if request.method=='GET':
 		return render_template('form.html')
@@ -144,7 +199,10 @@ def login():
 			if (str(claveh)==entries[0]):
 				cur=db.execute('INSERT into conexion (ip, id_usuario, fecha) values (\''+ip+'\','+str(us[0])+', julianday(datetime(\'now\')))')
 				db.commit()
-				return show_entries()
+				if (cargo(usuario)=='m'):
+					return show_entries()
+				else:
+					return pedido_barra()
 			else:
 				return render_template('errorUC.html')
 		db.close()
@@ -152,28 +210,48 @@ def login():
 	else:
 		return "Acceso Denegado"
 
-@app.route('/form', methods=['GET', 'POST'])
-def new_orden():
-	ip=request.remote_addr
-	db=connect_db()
+@app.route('/out')
+def logout():
 	
-	cur=db.execute('SELECT julianday(datetime(\'now\'))-fecha FROM conexion WHERE conexion.ip=\''+ip+'\'')
-	ultimac=[row[0] for row in cur.fetchall()]
+	ipc=request.remote_addr
+	db=connect_db()
+	cur=db.execute('delete FROM conexion WHERE ip=\''+ipc+'\'')
+	db.commit()
+	db.close()
+	return log_()
+	
 
-	#si ha pasado más de 4 horas el usuario es sacado
-	if (len(ultimac)!=0 and ultimac[0]>0.168) or (len(ultimac)==0):
-		cur=db.execute('DELETE FROM conexion WHERE conexion.ip=\''+ip+'\'')
-		db.commit();
+#carga los pedidos pendientes para que el barman los pueda tener en lista
+@app.route('/pendientes')
+def pedido_barra():
+	if activo(request.remote_addr)==False:
 		return render_template('log.html')
 	else:
-		if request.method=='GET':
+		if (cargo_usuario()=='b'):
 			db=connect_db()
-			cur=db.execute('SELECT distinct tipo from trago ')
+			cur=db.execute('select pedido.id_pedido, n_mesa, trago, cantidad from pedido, pedido_trago, trago where pedido.id_pedido=pedido_trago.id_pedido and estado=\'pendiente\' and pedido_trago.id_trago=trago.id_trago;')
 			entries=cur.fetchall()
 			db.close()
-			return render_template('form.html',entries=entries)
+			return render_template('tragospendientes.html', pedido=entries)
 		else:
-			return "Acceso Denegado"
+			return render_template('invalidoB.html')
+
+@app.route('/form', methods=['GET', 'POST'])
+def new_orden():
+	if activo(request.remote_addr)==False:
+		return render_template('log.html')
+	else:
+		if (cargo_usuario()=='m'):
+			if request.method=='GET':
+				db=connect_db()
+				cur=db.execute('SELECT distinct tipo from trago ')
+				entries=cur.fetchall()
+				db.close()
+				return render_template('form.html',entries=entries)
+			else:
+				return "Acceso Denegado"
+		else:
+			return render_template('invalidoM.html')
 
 
 if __name__ == "__main__":

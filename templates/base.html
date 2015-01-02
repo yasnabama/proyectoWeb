@@ -13,7 +13,7 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script type="text/javascript" src="static/jquery-1.11.1.js"></script>
-<script src="static/funciones.js"></script>
+
 
 <style type="text/css">
     body {
@@ -42,14 +42,18 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+
       </button>
       <a class="navbar-brand" href="{{url_for('log_')}}">Iniciar Login</a>
     </div>
     <div class="collapse navbar-collapse">
       <ul class="nav navbar-nav">
         <!--<li><a href="{{url_for('log_')}}">Login</a></li>-->
-        <li><a href="{{url_for('show_entries')}}">Pedidos por servir </a></li>
+        <li><a href="{{url_for('show_entries')}}">Pedidos por entregar</a></li>
         <li><a href="{{url_for('new_orden')}}">Tomar Pedido</a></li>
+        <li><a href="{{url_for('pedido_barra')}}">Pedidos por servir</a></li>
+        <li><a href="{{url_for('logout')}}">Cerrar Sesión</a></li>
         
       </ul>
     </div><!--/.nav-collapse -->

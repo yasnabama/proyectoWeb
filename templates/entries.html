@@ -15,9 +15,11 @@
 			<th id="{{trago.id_trago}}">{{trago.id_trago}}</th>
 			<th>{{trago.tipo}}</th>
 			<th>{{trago.trago}}</th>
-			<th><button type='button' class='btn btn-danger btnListo' ><span class='glyphicon glyphicon-ok'></span></button></th>
+			<th><button type='button' class='btn btn-danger btnListo' onclick="botonListo('id')"><span class='glyphicon glyphicon-ok' ></span></button></th>
 		</tr>
 		{% endfor %}
 	</table>
 	
 {% endblock content %}
+
+

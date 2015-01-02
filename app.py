@@ -73,7 +73,7 @@ def tipo_Trago():
 	tipoT=str(request.form['seleccionTipoTrago'])
 	return eleccionTrago(tipoT)
 
-#actualiza el estado del pedido... informando que se encuentra en barra para ser servido
+#actualiza el estado del pedido... informando que se encuentra en barra para ser servid
 @app.route('/pendientes',methods=['POST'])
 def servido():
 	if activo(request.remote_addr)==False:

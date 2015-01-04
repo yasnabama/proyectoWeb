@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block morehead %}
+<link href="{{url_for('static', filename='css/errorUC.css')}}" rel="stylesheet">
+{% endblock morehead %}
+{% block content %}
+	<div class="inner cover">
+        <h1 class="cover-heading">Registro Exitoso</h1>
+        <p class="lead">Ya puede utilizar su nueva cuenta</p>
+        <p class="lead">
+            <a href="{{url_for('pedido_barra')}}" class="btn btn-lg btn-default">Volver a menú principal</a>
+        </p>
+    </div>
+{% endblock content %}

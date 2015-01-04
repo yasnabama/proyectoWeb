@@ -138,15 +138,62 @@ def log_():
 		else:
 			return pedido_barra()
 
+@app.route('/registro')
+def reg():
+	if activo(request.remote_addr)==False:
+		return render_template('log.html')
+	else:
+		if(cargo_usuario()=='m'):
+			return render_template('invalidoB.html')
+		else:
+			return render_template('registro.html')
+
+@app.route('/regist', methods=['POST'])
+def registrado():
+	if activo(request.remote_addr)==False:
+		return render_template('log.html')
+	else:
+		usuario=request.form['inputUser']
+		clave=request.form['inputPassword']
+		carg=request.form['seleccionCantidad']
+		c=hashlib.md5()
+		c.update(clave.encode('utf-8'))
+		c=str(c.digest())
+
+		usuario='\''+usuario+'\''
+		clave='\''+clave+'\''
+		carg='\''+carg+'\''
+
+		#c=c.replace('\\','\\\\')
+		c=c.replace('\'','\'\'')
+		c='\''+c+'\''
+		print(c)
+				
+		db=connect_db()
+		cur=db.execute('select nombre from usuario where usuario.nombre='+usuario+';')
+		co=[row[0] for row in cur.fetchall()]	
+		db.close()
+		if(len(co)!=0):
+			return render_template('usuarioE.html')
+		else:
+			db=connect_db()
+			cur=db.execute('insert into usuario(nombre, cargo, pass) values('+usuario+', '+carg+', '+c+');')
+			db.commit()
+			db.close()
+			return render_template('registroEx.html')
+			
+
 def cargo_usuario():
 	db=connect_db()
 	cur=db.execute('select cargo from usuario, conexion where conexion.id_usuario=usuario.id_usuario and ip=\''+request.remote_addr+'\';')
 	co=[row[0] for row in cur.fetchall()]
 	if(co[0]=='Barman'):
+		db.close()
 		return 'b'
 	else:
+		db.close()
 		return 'm'
-	db.close
+	
 
 def activo(a):
 	ip=a
@@ -159,9 +206,12 @@ def activo(a):
 	if (len(ultimac)!=0 and ultimac[0]>0.0070) or (len(ultimac)==0):
 		cur=db.execute('DELETE FROM conexion WHERE conexion.ip=\''+ip+'\'')
 		db.commit();
+		db.close()
 		return False
 	else:
+		db.close()
 		return True
+
 def cargo(usuario):
 	db=connect_db()
 	cur=db.execute('SELECT cargo FROM usuario WHERE usuario.nombre=\''+usuario+'\'')
@@ -189,6 +239,7 @@ def login():
 		cur=db.execute('SELECT id_usuario FROM usuario WHERE usuario.nombre=\''+usuario+'\'')
 		us=[row[0] for row in cur.fetchall()]
 		if len(us) == 0:
+			db.close()
 			return render_template('errorUC.html')
 		else:
 			hc=hashlib.md5()
@@ -200,14 +251,18 @@ def login():
 				cur=db.execute('INSERT into conexion (ip, id_usuario, fecha) values (\''+ip+'\','+str(us[0])+', julianday(datetime(\'now\')))')
 				db.commit()
 				if (cargo(usuario)=='m'):
+					db.close()
 					return show_entries()
 				else:
+					db.close()
 					return pedido_barra()
 			else:
+				db.close()
 				return render_template('errorUC.html')
 		db.close()
 		
 	else:
+		db.close()
 		return "Acceso Denegado"
 
 @app.route('/out')
@@ -231,7 +286,6 @@ def pedido_barra():
 			db=connect_db()
 			cur=db.execute('select pedido.id_pedido, n_mesa, trago, cantidad from pedido, pedido_trago, trago where pedido.id_pedido=pedido_trago.id_pedido and estado=\'pendiente\' and pedido_trago.id_trago=trago.id_trago;')
 			entries=cur.fetchall()
-			print("kk")
 			db.close()
 			return render_template('tragospendientes.html', pedido=entries)
 		else:

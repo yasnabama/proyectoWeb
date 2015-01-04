@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block morehead %}
+<link href="{{url_for('static', filename='css/singin.css')}}" rel="stylesheet">
+{% endblock morehead %}
+{% block content %}
+	<div class="container">
+
+      <form class="form-signin" action="{{ url_for('registrado') }}" method="post">
+        <h2 class="form-signin-heading">Crear Registro</h2>
+        <label for="inputUser" class="sr-only">Usuario</label>
+        <input type="user" name="inputUser" class="form-control" placeholder="Usuario" required autofocus>
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" name="inputPassword" class="form-control" placeholder="Contraseña" required>
+       
+        <div class="form-group">
+            <label for="trago" class="col-sm-2 control-label">Cargo:</label>
+            <div class="col-sm-10">
+                <select name="seleccionCantidad" width="300px" id="cantidad"> 
+                    <option name="Mesero">Mesero</opcion>
+                    <option name="Barman">Barman</opcion>
+                </select>
+            </div>
+        </div>
+        
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Registrar</button>
+      </form>
+
+    </div>
+{% endblock content %}

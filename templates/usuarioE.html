@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block morehead %}
+<link href="{{url_for('static', filename='css/errorUC.css')}}" rel="stylesheet">
+{% endblock morehead %}
+{% block content %}
+	<div class="inner cover">
+        <h1 class="cover-heading">Usuario existente</h1>
+        <p class="lead">Intente con otro nombre de usuario</p>
+        <p class="lead">
+            <a href="{{url_for('reg')}}" class="btn btn-lg btn-default">Volver a intentar</a>
+        </p>
+    </div>
+{% endblock content %}

@@ -15,12 +15,14 @@ from werkzeug import secure_filename
 
 app=Flask(__name__)
 
+
 def connect_db():
 	"""Retorna una conexion a la BD"""
 	path_to_db='bar.db'
 	rv=sqlite3.connect(path_to_db)
 	rv.row_factory=sqlite3.Row
 	return rv
+
 
 @app.route('/confirmarP/<string:data>',methods=['POST'])
 def confirmarP(data):
@@ -41,11 +43,9 @@ def confirmarP(data):
 		#Select para saber el id_pedido generado con el insert actual.
 		us1=db.execute('SELECT id_pedido FROM pedido ORDER BY id_pedido DESC LIMIT 1')
 		us1=[row[0] for row in us1.fetchall()]
-		print(us1[0])
 		#Select para saber el id_trago 
 		us2=db.execute('SELECT id_trago FROM trago where trago.trago=\''+trago+'\'')
 		us2=[row[0] for row in us2.fetchall()]
-		print(us2[0])
 		#insert a tabla pedido_trago de la prierma fila que encuentra en la tabla resumen. 
 		cur=db.execute('INSERT into pedido_trago (id_pedido, id_trago, cantidad, estado) values ('+str(us1[0])+','+str(us2[0])+','+str(cantidad)+', "pendiente") ')
 		db.commit()
@@ -56,12 +56,10 @@ def confirmarP(data):
 		#Select para saber el id_pedido generado con el insert actual.
 		us1=db.execute('SELECT id_pedido FROM pedido ORDER BY id_pedido DESC LIMIT 1')
 		us1=[row[0] for row in us1.fetchall()]
-		print(us1[0])
 		#Select para saber el id_trago 
 		us2=db.execute('SELECT id_trago FROM trago where trago.trago=\''+trago+'\'')
 		us2=[row[0] for row in us2.fetchall()]
 		# insert con las demas filas de la tabla. 
-		print(us2[0])
 		cur=db.execute('INSERT into pedido_trago (id_pedido, id_trago, cantidad, estado) values ('+str(us1[0])+','+str(us2[0])+','+str(cantidad)+', "pendiente") ')
 		db.commit()
 		db.close()
@@ -72,6 +70,7 @@ def confirmarP(data):
 def tipo_Trago():
 	tipoT=str(request.form['seleccionTipoTrago'])
 	return eleccionTrago(tipoT)
+
 
 #actualiza el estado del pedido... informando que se encuentra en barra para ser servid
 @app.route('/pendientes',methods=['POST'])
@@ -102,6 +101,7 @@ def entregado():
 		db.close();
 		return show_entries()
 
+
 def eleccionTrago(tipoT):
 	db=connect_db()
 	cur=db.execute('SELECT trago from trago where trago.tipo=\''+tipoT+'\'')
@@ -127,6 +127,8 @@ def show_entries():
 			return render_template('entries.html', pedido=entries)
 		else:
 			return render_template('invalidoM.html')
+
+
 #si estas con sesion activa no entras a logiarte FALTA VER Q CARGO
 @app.route('/')
 def log_():
@@ -138,6 +140,7 @@ def log_():
 		else:
 			return pedido_barra()
 
+
 @app.route('/registro')
 def reg():
 	if activo(request.remote_addr)==False:
@@ -147,6 +150,7 @@ def reg():
 			return render_template('invalidoB.html')
 		else:
 			return render_template('registro.html')
+
 
 @app.route('/regist', methods=['POST'])
 def registrado():
@@ -212,6 +216,7 @@ def activo(a):
 		db.close()
 		return True
 
+
 def cargo(usuario):
 	db=connect_db()
 	cur=db.execute('SELECT cargo FROM usuario WHERE usuario.nombre=\''+usuario+'\'')
@@ -221,6 +226,7 @@ def cargo(usuario):
 		return 'm'
 	else:
 		return 'b'
+
 
 #logea a los usuarios
 @app.route('/log', methods=['GET', 'POST'])
@@ -234,8 +240,6 @@ def login():
 		
 		db=connect_db()
 		
-		
-
 		cur=db.execute('SELECT id_usuario FROM usuario WHERE usuario.nombre=\''+usuario+'\'')
 		us=[row[0] for row in cur.fetchall()]
 		if len(us) == 0:
@@ -265,6 +269,7 @@ def login():
 		db.close()
 		return "Acceso Denegado"
 
+
 @app.route('/out')
 def logout():
 	
@@ -290,6 +295,7 @@ def pedido_barra():
 			return render_template('tragospendientes.html', pedido=entries)
 		else:
 			return render_template('invalidoB.html')
+
 
 @app.route('/form', methods=['GET', 'POST'])
 def new_orden():
